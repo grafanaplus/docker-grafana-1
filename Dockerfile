@@ -1,5 +1,9 @@
 FROM debian:jessie
 
+# Grafana user and group
+RUN groupadd -g 999 grafana && useradd -d /var/lib/postgresql/9.3 -u 999 -g 999 grafana
+
+
 # Gosu
 RUN    gpg --keyserver pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
     && apt-get update \
@@ -34,15 +38,22 @@ RUN    apt-get update \
     && apt-get -y --purge --auto-remove remove curl \
     && rm -rf /var/lib/apt/lists/*
 
+
+# Add files
+ADD entrypoint.sh /docker/entrypoint.sh
+RUN chmod 0755 /docker/entrypoint.sh
+
+
 # Log file
 RUN ln -sf /dev/null /var/log/grafana/grafana.log
 RUN ln -sf /dev/null /var/log/grafana/xorm.log
 
+
 VOLUME ["/var/lib/grafana"]
-#VOLUME ["/etc/grafana"]
 
 EXPOSE 3000
 
 WORKDIR /usr/share/grafana
 
-CMD ["/usr/sbin/grafana-server", "--config=/etc/grafana/grafana.ini", "cfg:default.paths.data=/var/lib/grafana", "cfg:default.paths.logs=/var/log/grafana"]
+ENTRYPOINT ["/docker/entrypoint.sh"]
+CMD ["grafana-server", "--config=/etc/grafana/grafana.ini", "cfg:default.paths.data=/var/lib/grafana", "cfg:default.paths.logs=/var/log/grafana"]
