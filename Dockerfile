@@ -25,7 +25,7 @@ ENV GRAFANA_PLUGINS_MD5SUM 0a9438d4fa2140a0108a5cbde677b0e6
 
 # Grafana package
 RUN    apt-get update \
-    && apt-get install -y curl libfontconfig \
+    && apt-get install -y curl libfontconfig openssl ca-certificates \
     && curl -SL -o /tmp/grafana.deb https://grafanarel.s3.amazonaws.com/builds/grafana_${GRAFANA_VERSION}_amd64.deb \
     && curl -SL -o /tmp/plugins.tgz https://github.com/grafana/grafana-plugins/archive/${GRAFANA_PLUGINS_VERSION}.tar.gz \
     && echo "${GRAFANA_MD5SUM}  /tmp/grafana.deb" | md5sum -c \
